@@ -49,11 +49,7 @@ class Settings(BaseSettings):
     
     class Config:
         # Look for .env in multiple locations
-        env_file = [
-            ".env",  # Current directory
-            "../.env",  # Parent directory
-            "../../.env"  # Grandparent directory
-        ]
+        env_file = [".env"]
         env_file_encoding = "utf-8"
         case_sensitive = True
 

@@ -10,7 +10,6 @@ from fastapi.responses import JSONResponse
 
 from models.telemetry import VehicleStats, AnomalyEvent
 from utils.logging_config import get_logger
-from api.ingestion import telemetry_store  # Access the in-memory store
 
 # Create router
 router = APIRouter()

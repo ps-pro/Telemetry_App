@@ -29,7 +29,7 @@ class TelemetryReading(BaseModel):
         return datetime.fromisoformat(self.timestamp.replace('Z', '+00:00'))
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "vehicle_id": "V1",
                 "timestamp": "2025-09-04T12:01:00Z",
@@ -46,7 +46,7 @@ class TelemetryBatch(BaseModel):
     readings: List[TelemetryReading] = Field(..., min_items=1, max_items=1000)
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "readings": [
                     {
@@ -83,7 +83,7 @@ class SimulationEnginePayload(BaseModel):
         return v
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "timestamp": "2025-09-04T12:01:00Z",
                 "batch_size": 2,
@@ -159,7 +159,7 @@ class IngestionResponse(BaseModel):
     batch_timestamp: Optional[str] = None
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "status": "success",
                 "processed_count": 150,
@@ -186,7 +186,7 @@ class AnomalyEvent(BaseModel):
     confidence_score: Optional[float] = Field(None, ge=0, le=1)
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "vehicle_id": "V1",
                 "timestamp": "2025-09-04T12:01:00Z",
@@ -212,7 +212,7 @@ class HourlyKPI(BaseModel):
     fuel_consumed_liters: Optional[float] = Field(None, ge=0)
     
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "vehicle_id": "V1",
                 "hour_start": "2025-09-04T12:00:00Z",
@@ -237,7 +237,7 @@ class VehicleStats(BaseModel):
     anomaly_count: int = 0
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             "example": {
                 "vehicle_id": "V1",
                 "period_start": "2025-09-04T00:00:00Z",
