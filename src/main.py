@@ -22,6 +22,7 @@ from utils.config import get_settings
 
 from dotenv import load_dotenv
 import os
+from sqlalchemy import text
 
 # Force load .env file
 load_dotenv('.env')

@@ -50,7 +50,7 @@ def extract_telemetry_readings(payload: Dict[str, Any]) -> tuple[List[Dict[str, 
                     "longitude": Decimal(str(reading_data.get("longitude", 0.0))),
                     "speed_kph": Decimal(str(reading_data.get("speed_kph", 0.0))),
                     "fuel_percentage": Decimal(str(reading_data.get("fuel_percentage", 0.0))),
-                    "ingestion_format": IngestionFormatEnum.SIMULATION_ENGINE
+                    "ingestion_format": "SIMULATION_ENGINE"
                 }
                 readings.append(reading)
             
@@ -72,7 +72,7 @@ def extract_telemetry_readings(payload: Dict[str, Any]) -> tuple[List[Dict[str, 
                     "longitude": Decimal(str(reading_data.get("longitude", 0.0))),
                     "speed_kph": Decimal(str(reading_data.get("speed_kph", 0.0))),
                     "fuel_percentage": Decimal(str(reading_data.get("fuel_percentage", 0.0))),
-                    "ingestion_format": IngestionFormatEnum.LEGACY
+                    "ingestion_format": "LEGACY"
                 }
                 readings.append(reading)
             
@@ -93,7 +93,7 @@ def extract_telemetry_readings(payload: Dict[str, Any]) -> tuple[List[Dict[str, 
                     "longitude": Decimal(str(reading_data.get("longitude", 0.0))),
                     "speed_kph": Decimal(str(reading_data.get("speed_kph", 0.0))),
                     "fuel_percentage": Decimal(str(reading_data.get("fuel_percentage", 0.0))),
-                    "ingestion_format": IngestionFormatEnum.RAW_ARRAY
+                    "ingestion_format": "RAW_ARRAY"
                 }
                 readings.append(reading)
             
@@ -113,7 +113,7 @@ def extract_telemetry_readings(payload: Dict[str, Any]) -> tuple[List[Dict[str, 
                 "longitude": Decimal(str(payload.get("longitude", 0.0))),
                 "speed_kph": Decimal(str(payload.get("speed_kph", 0.0))),
                 "fuel_percentage": Decimal(str(payload.get("fuel_percentage", 0.0))),
-                "ingestion_format": IngestionFormatEnum.SINGLE_READING
+                "ingestion_format": "SINGLE_READING"
             }
             readings.append(reading)
             
@@ -280,7 +280,7 @@ async def ingest_telemetry_db(
         # Create ingestion batch record
         batch_record = IngestionBatch(
             batch_timestamp=datetime.fromisoformat(payload.get("timestamp", datetime.now().isoformat()).replace('Z', '+00:00')) if isinstance(payload, dict) else datetime.now(),
-            ingestion_format=getattr(IngestionFormatEnum, format_type.upper(), IngestionFormatEnum.SIMULATION_ENGINE),
+            ingestion_format=format_type.upper(),
             total_readings=len(readings),
             payload_metadata={
                 "payload_keys": list(payload.keys()) if isinstance(payload, dict) else ["array"],
@@ -405,7 +405,7 @@ async def get_ingestion_stats_db(session: Session = Depends(get_db_session)):
             vehicle_activity_dict[vehicle_id] = {
                 "count": count,
                 "latest_timestamp": latest_ts.isoformat() if latest_ts else None,
-                "formats": [f.value if f else 'unknown' for f in (formats or [])]
+                "formats": [f if f else 'unknown' for f in (formats or [])]
             }
         
         # Get format breakdown
@@ -415,7 +415,7 @@ async def get_ingestion_stats_db(session: Session = Depends(get_db_session)):
         ).group_by(TelemetryReading.ingestion_format).all()
         
         format_counts = {
-            fmt.value if fmt else 'unknown': count 
+            fmt if fmt else 'unknown': count 
             for fmt, count in format_breakdown
         }
         
@@ -439,7 +439,7 @@ async def get_ingestion_stats_db(session: Session = Depends(get_db_session)):
                 "timestamp": r.timestamp.isoformat(),
                 "speed_kph": float(r.speed_kph),
                 "fuel_percentage": float(r.fuel_percentage),
-                "format": r.ingestion_format.value if r.ingestion_format else 'unknown'
+                "format": r.ingestion_format if r.ingestion_format else 'unknown'
             }
             for r in recent_readings
         ]

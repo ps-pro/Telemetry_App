@@ -1,90 +1,40 @@
-"""
-Super simple test to verify API is working.
-Run this AFTER starting the API with: python main.py
-"""
+# debug_payload_format.py
 import requests
 import json
+from datetime import datetime
 
-def test_api():
-    """Test the basic API endpoints."""
-    base_url = "http://localhost:8000"
-    
-    print("🧪 Testing Telemetry Platform API")
-    print("=" * 40)
-    
-    # Test 1: Root endpoint
-    try:
-        print("1. Testing root endpoint...")
-        response = requests.get(base_url)
-        if response.status_code == 200:
-            print("   ✅ ROOT: API is responding")
-            print(f"   📄 Response: {response.json()}")
-        else:
-            print(f"   ❌ ROOT failed: {response.status_code}")
-    except Exception as e:
-        print(f"   ❌ Cannot connect to API: {e}")
-        print("   💡 Make sure to run: python main.py")
-        return False
-    
-    # Test 2: Health check
-    try:
-        print("\n2. Testing health endpoint...")
-        response = requests.get(f"{base_url}/health")
-        if response.status_code == 200:
-            print("   ✅ HEALTH: API is healthy")
-            print(f"   📄 Response: {response.json()}")
-        else:
-            print(f"   ❌ HEALTH failed: {response.status_code}")
-    except Exception as e:
-        print(f"   ❌ Health check failed: {e}")
-    
-    # Test 3: Simple data ingestion
-    try:
-        print("\n3. Testing data ingestion...")
-        test_data = {
-            "readings": [
-                {
-                    "vehicle_id": "TEST-V1",
-                    "timestamp": "2025-09-04T12:00:00Z",
-                    "latitude": 22.57,
-                    "longitude": 88.36,
-                    "speed_kph": 42.0,
-                    "fuel_percentage": 73.1
-                }
-            ]
+# Test the exact same payload format as DataStreamHandler
+test_payload = {
+    "timestamp": datetime.now().isoformat() + "Z",
+    "batch_size": 2,
+    "telemetry_data": [
+        {
+            "vehicle_id": "DEBUG-V001",
+            "timestamp": datetime.now().isoformat() + "Z",
+            "latitude": 22.5700,
+            "longitude": 88.3600,
+            "speed_kph": 45.0,
+            "fuel_percentage": 75.5
+        },
+        {
+            "vehicle_id": "DEBUG-V002", 
+            "timestamp": datetime.now().isoformat() + "Z",
+            "latitude": 22.5710,
+            "longitude": 88.3610,
+            "speed_kph": 0.0,
+            "fuel_percentage": 68.2
         }
-        
-        response = requests.post(
-            f"{base_url}/api/v1/ingest",
-            json=test_data,
-            headers={"Content-Type": "application/json"}
-        )
-        
-        if response.status_code == 200:
-            print("   ✅ INGEST: Data ingestion working")
-            print(f"   📄 Response: {response.json()}")
-        else:
-            print(f"   ❌ INGEST failed: {response.status_code}")
-            print(f"   📄 Error: {response.text}")
-    except Exception as e:
-        print(f"   ❌ Ingestion test failed: {e}")
-    
-    # Test 4: Check stats
-    try:
-        print("\n4. Testing stats endpoint...")
-        response = requests.get(f"{base_url}/api/v1/ingest/stats")
-        if response.status_code == 200:
-            print("   ✅ STATS: Statistics working")
-            print(f"   📄 Response: {response.json()}")
-        else:
-            print(f"   ❌ STATS failed: {response.status_code}")
-    except Exception as e:
-        print(f"   ❌ Stats test failed: {e}")
-    
-    print("\n🎉 API testing complete!")
-    print("💡 Next: Open http://localhost:8000/docs in your browser")
-    
-    return True
+    ]
+}
 
-if __name__ == "__main__":
-    test_api()
+print("Sending payload:")
+print(json.dumps(test_payload, indent=2))
+
+response = requests.post(
+    "http://localhost:8000/api/v1/ingest",
+    json=test_payload,
+    headers={"Content-Type": "application/json"}
+)
+
+print(f"\nResponse status: {response.status_code}")
+print(f"Response: {response.json()}")
